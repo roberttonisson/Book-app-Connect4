@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace GameEngine
 {
@@ -8,13 +9,15 @@ namespace GameEngine
     public class Game
     {
         // null, X, O
-        private CellState[,] Board { get;  set; }
+        private CellState[,] Board { get; set; }
 
         public int BoardWidth { get; }
         public int BoardHeight { get; }
 
+        public Dictionary<int, int> RowStatus = new Dictionary<int, int>();
+
         private bool _playerZeroMove;
-        
+
         public Game(int boardHeight = 3, int boardWidth = 3)
         {
             if (boardHeight < 3 || boardWidth < 3)
@@ -25,9 +28,14 @@ namespace GameEngine
             BoardHeight = boardHeight;
             BoardWidth = boardWidth;
             // initialize the board
+            for (int i = 1; i <= boardWidth; i++)
+            {
+                RowStatus[i] = 0;
+            }
+
             Board = new CellState[boardHeight, boardWidth];
         }
-        
+
         public CellState[,] GetBoard()
         {
             var result = new CellState[BoardHeight, BoardWidth];
@@ -36,19 +44,13 @@ namespace GameEngine
         }
 
 
-        public void Move(int posY, int posX)
+        public void Move(int row)
         {
-            if (Board[posY, posX] != CellState.Empty)
-            {
-                return;
-            }
+            Board[BoardHeight - RowStatus[row] - 1, row - 1] = _playerZeroMove ? CellState.O : CellState.X;
 
-            Board[posY, posX] = _playerZeroMove ? CellState.X : CellState.O;
-            
+            RowStatus[row] = RowStatus[row] + 1;
+
             _playerZeroMove = !_playerZeroMove;
         }
-
     }
-    
-    
 }

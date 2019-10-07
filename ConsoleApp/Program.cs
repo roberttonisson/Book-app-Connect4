@@ -17,7 +17,7 @@ namespace icd0008_2019f
 
             var gameMenu = new Menu(1)
             {
-                Title = "Start a new game of Tic-Tac-Toe",
+                Title = "Start a new game of Connect 4",
                 MenuItemsDictionary = new Dictionary<string, MenuItem>()
                 {
                     {
@@ -28,24 +28,17 @@ namespace icd0008_2019f
                         }
                     },
                     {
-                        "A", new MenuItem()
-                        {
-                            Title = "Alien starts",
-                            CommandToExecute = null
-                        }
-                    },
-                    {
                         "2", new MenuItem()
                         {
                             Title = "Human starts",
-                            CommandToExecute = null
+                            CommandToExecute = TestGame
                         }
                     },
                     {
                         "3", new MenuItem()
                         {
                             Title = "Human against Human",
-                            CommandToExecute = null
+                            CommandToExecute = TestGame
                         }
                     },
                 }
@@ -53,7 +46,7 @@ namespace icd0008_2019f
 
             var menu0 = new Menu(0)
             {
-                Title = "Tic Tac Toe Main Menu",
+                Title = "Connecct 4 Main Menu",
                 MenuItemsDictionary = new Dictionary<string, MenuItem>()
                 {
                     {
@@ -72,7 +65,7 @@ namespace icd0008_2019f
 
         static string TestGame()
         {
-            var game = new Game(7, 7);
+            var game = new Game(8, 10);
 
             var done = false;
             do
@@ -80,35 +73,25 @@ namespace icd0008_2019f
                 Console.Clear();
                 GameUI.PrintBoard(game);
 
-                var userXint = -1;
-                var userYint = -1;
+                var rowNum = -1;
+                var currentMoves = 0;
                 do
                 {
-                    Console.WriteLine("Give me Y value!");
+                    Console.WriteLine("Which row would you like to out your piece?(1-" + game.BoardWidth + ")");
                     Console.Write(">");
-                    var userY = Console.ReadLine();
+                    var selectedRow = Console.ReadLine();
 
-                    if (!int.TryParse(userY, out userYint))
+                    if (!int.TryParse(selectedRow, out rowNum) || game.RowStatus[rowNum] >= game.BoardHeight)
                     {
-                        Console.WriteLine($"{userY} is not a number!");
+                        Console.WriteLine($"{selectedRow} is not a correct row or is already full!");
+                        rowNum = -1;
                     }
-                } while (userYint < 0);
+                    
+                } while (rowNum < 1);
 
-                do
-                {
-                    Console.WriteLine("Give me X value!");
-                    Console.Write(">");
-                    var userX = Console.ReadLine();
-
-                    if (!int.TryParse(userX, out userXint))
-                    {
-                        Console.WriteLine($"{userX} is not a number!");
-                    }
-                } while (userXint < 0);
-
-                game.Move(userYint, userXint);
-
-                done = userYint == 0 && userXint == 0;
+                game.Move(rowNum);
+                currentMoves++;
+                done = game.BoardHeight * game.BoardWidth <= currentMoves;
             } while (!done);
 
 

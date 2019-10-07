@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿using System;
 using System.ComponentModel;
 using GameEngine;
 
@@ -6,44 +6,54 @@ namespace ConsoleUI
 {
     public static class GameUI
     {
-        private static readonly string _verticalSeparator = "|";
-        private static readonly string _horizontalSeparator = "-";
-        private static readonly string _centerSeparator = "+";
-        
+        private static readonly string _verticalSeparator = "│";
+        private static readonly string _horizontalSeparator = "─";
+        private static readonly string _crossSeparator = "┼";
+        private static readonly string _leftCrossSeparator = "├";
+        private static readonly string _rightCrossSeparator = "┤";
+
         public static void PrintBoard(Game game)
         {
+            var line = "";
             var board = game.GetBoard();
             for (int yIndex = 0; yIndex < game.BoardHeight; yIndex++)
             {
-                var line = "";
+                line = _verticalSeparator;
                 for (int xIndex = 0; xIndex < game.BoardWidth; xIndex++)
                 {
-                    
-                    line = line + " " + GetSingleState(board[yIndex, xIndex]) + " ";
-                    if (xIndex < game.BoardWidth - 1)
-                    {
-                        line = line + _verticalSeparator;
-                    }
+                    line = line + " " + GetSingleState(board[yIndex, xIndex]) + " " + _verticalSeparator;
                 }
-                
+
                 Console.WriteLine(line);
 
-                if (yIndex < game.BoardHeight - 1)
+                if (yIndex < game.BoardHeight)
                 {
-                    line = "";
+                    line = yIndex < game.BoardHeight - 1 ? _leftCrossSeparator : "└";
+
                     for (int xIndex = 0; xIndex < game.BoardWidth; xIndex++)
                     {
-                        line = line + _horizontalSeparator+ _horizontalSeparator+ _horizontalSeparator;
+                        line = line + _horizontalSeparator + _horizontalSeparator + _horizontalSeparator;
                         if (xIndex < game.BoardWidth - 1)
                         {
-                            line = line +_centerSeparator;
+                            line += yIndex < game.BoardHeight - 1 ? _crossSeparator : "┴";
+                        }
+                        else
+                        {
+                            line += yIndex < game.BoardHeight - 1 ? _rightCrossSeparator : "┘";
                         }
                     }
+
                     Console.WriteLine(line);
                 }
-
-                
             }
+
+            line = "";
+            for (int i = 1; i <= game.BoardWidth; i++)
+            {
+                line = line + "  " + i + " ";
+            }
+
+            Console.WriteLine(line);
         }
 
         public static string GetSingleState(CellState state)
@@ -59,7 +69,6 @@ namespace ConsoleUI
                 default:
                     throw new InvalidEnumArgumentException("Unknown enum option!");
             }
-            
         }
     }
 }
