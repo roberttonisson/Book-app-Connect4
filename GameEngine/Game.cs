@@ -18,9 +18,9 @@ namespace GameEngine
 
         private bool _playerZeroMove;
 
-        public Game(int boardHeight = 3, int boardWidth = 3)
+        public Game(int boardHeight = 4, int boardWidth = 4)
         {
-            if (boardHeight < 3 || boardWidth < 3)
+            if (boardHeight < 4 || boardWidth < 4)
             {
                 throw new ArgumentException("Board size has to be at least 3x3!");
             }
