@@ -14,7 +14,7 @@ namespace GameEngine
         public int BoardWidth { get; }
         public int BoardHeight { get; }
 
-        public Dictionary<int, int> RowStatus = new Dictionary<int, int>();
+        public Dictionary<int, int> ColumnStatus = new Dictionary<int, int>();
 
         private bool _playerZeroMove;
 
@@ -30,7 +30,7 @@ namespace GameEngine
             // initialize the board
             for (int i = 1; i <= boardWidth; i++)
             {
-                RowStatus[i] = 0;
+                ColumnStatus[i] = 0;
             }
 
             Board = new CellState[boardHeight, boardWidth];
@@ -46,9 +46,9 @@ namespace GameEngine
 
         public void Move(int row)
         {
-            Board[BoardHeight - RowStatus[row] - 1, row - 1] = _playerZeroMove ? CellState.O : CellState.X;
+            Board[BoardHeight - ColumnStatus[row] - 1, row - 1] = _playerZeroMove ? CellState.O : CellState.X;
 
-            RowStatus[row] = RowStatus[row] + 1;
+            ColumnStatus[row] = ColumnStatus[row] + 1;
 
             _playerZeroMove = !_playerZeroMove;
         }

@@ -70,9 +70,11 @@ namespace MenuSystem
                     if (menuItem.CommandToExecute != null)
                     {
                         returnCommand = menuItem.CommandToExecute(); // run the command 
-                        break;
+                        //break;
                     }
                 }
+                
+                
 
 
 

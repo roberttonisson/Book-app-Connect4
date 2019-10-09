@@ -70,8 +70,8 @@ namespace icd0008_2019f
             var input = Console.ReadLine();
             if (!int.TryParse(input, out var boardHeight) || boardHeight < 4)
             {
-                Console.WriteLine("Invalid input, automatically selected default value 8. ");
-                boardHeight = 8;
+                Console.WriteLine("Invalid input, automatically selected default value 6. ");
+                boardHeight = 6;
             }
 
             Console.WriteLine("Select the board width (min 4): ");
@@ -79,8 +79,8 @@ namespace icd0008_2019f
             input = Console.ReadLine();
             if (!int.TryParse(input, out var boardWidth) || boardWidth < 4)
             {
-                Console.WriteLine("Invalid input, automatically selected default value 10. ");
-                boardWidth = 10;
+                Console.WriteLine("Invalid input, automatically selected default value 7. ");
+                boardWidth = 7;
             }
 
             var game = new Game(boardHeight, boardWidth);
@@ -91,29 +91,30 @@ namespace icd0008_2019f
                 Console.Clear();
                 GameUI.PrintBoard(game);
 
-                var rowNum = -1;
+                var columnNum = -1;
 
                 do
                 {
-                    Console.WriteLine("Which row would you like to out your piece?(1-" + game.BoardWidth + ")");
+                    Console.WriteLine("Which column would you like to out your piece?(1-" + game.BoardWidth + ")");
                     Console.Write(">");
                     var selectedRow = Console.ReadLine();
 
-                    if (!int.TryParse(selectedRow, out rowNum) || rowNum > game.BoardWidth
-                                                               || game.RowStatus[rowNum] >= game.BoardHeight)
+                    if (!int.TryParse(selectedRow, out columnNum) || columnNum > game.BoardWidth
+                                                               || game.ColumnStatus[columnNum] >= game.BoardHeight)
                     {
-                        Console.WriteLine($"{selectedRow} is not a correct row or is already full!");
-                        rowNum = -1;
+                        Console.WriteLine($"{selectedRow} is not a correct column or is already full!");
+                        columnNum = -1;
                     }
-                } while (rowNum < 1);
+                } while (columnNum < 1);
 
-                game.Move(rowNum);
+                game.Move(columnNum);
                 currentMoves += 1;
                 done = game.BoardHeight * game.BoardWidth <= currentMoves;
             } while (!done);
 
-
-            return "GAME OVER!! No more moves.";
+            Console.WriteLine("Game over! No more moves left.");
+            Console.WriteLine();
+            return "M";
         }
     }
 }
