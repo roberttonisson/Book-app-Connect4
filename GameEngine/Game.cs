@@ -8,37 +8,45 @@ namespace GameEngine
     /// </summary>
     public class Game
     {
-        // null, X, O
-        private CellState[,] Board { get; set; }
+        public CellState[][] Board { get; set; }
 
-        public int BoardWidth { get; }
-        public int BoardHeight { get; }
+        public int BoardWidth { get; set; }
+        public int BoardHeight { get; set; }
+
+        public bool _playerZeroMove { get; set; }
 
         public Dictionary<int, int> ColumnStatus = new Dictionary<int, int>();
 
-        private bool _playerZeroMove;
-
-        public Game(int boardHeight = 4, int boardWidth = 4)
+        public Game()
         {
-            if (boardHeight < 4 || boardWidth < 4)
+        }
+
+        public Game(GameSettings settings)
+        {
+            if (settings.BoardHeight < 4 || settings.BoardWidth < 4)
             {
-                throw new ArgumentException("Board size has to be at least 3x3!");
+                throw new ArgumentException("Board size has to be at least 4x4!");
             }
 
-            BoardHeight = boardHeight;
-            BoardWidth = boardWidth;
+            BoardHeight = settings.BoardHeight;
+            BoardWidth = settings.BoardWidth;
             // initialize the board
-            for (int i = 1; i <= boardWidth; i++)
+            for (int i = 1; i <= BoardWidth; i++)
             {
                 ColumnStatus[i] = 0;
             }
 
-            Board = new CellState[boardHeight, boardWidth];
+            Board = new CellState[settings.BoardHeight][];
+            for (int i = 0; i < BoardHeight; i++)
+            {
+                Board[i] = new CellState[BoardWidth];
+            }
         }
 
-        public CellState[,] GetBoard()
+
+        public CellState[][] GetBoard()
         {
-            var result = new CellState[BoardHeight, BoardWidth];
+            var result = new CellState[BoardHeight][];
             Array.Copy(Board, result, Board.Length);
             return result;
         }
@@ -46,7 +54,7 @@ namespace GameEngine
 
         public void Move(int row)
         {
-            Board[BoardHeight - ColumnStatus[row] - 1, row - 1] = _playerZeroMove ? CellState.O : CellState.X;
+            Board[BoardHeight - ColumnStatus[row] - 1][row - 1] = _playerZeroMove ? CellState.O : CellState.X;
 
             ColumnStatus[row] = ColumnStatus[row] + 1;
 

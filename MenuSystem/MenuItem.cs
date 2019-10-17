@@ -4,7 +4,7 @@ namespace MenuSystem
 {
     public class MenuItem
     {
-        private string _title;
+        private string _title = default!;
 
         public string Title
         {
@@ -15,7 +15,7 @@ namespace MenuSystem
 
         // reference to an method, which returns a string and takes no parameters
         // func<...parameter types..., return type>
-        public Func<string> CommandToExecute { get; set; }
+        public Func<string> CommandToExecute { get; set; } = default!;
         
         private static string Validate(string item, int minLength, int maxLength, bool toUpper)
         {

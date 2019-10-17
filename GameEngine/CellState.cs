@@ -1,10 +1,10 @@
 ﻿namespace GameEngine
-{
-    public enum CellState
-    {
-        Empty, 
-        X,
-        O
-    }
-    
-}
+ {
+     public enum CellState
+     {
+         Empty, 
+         X,
+         O
+     }
+     
+ }

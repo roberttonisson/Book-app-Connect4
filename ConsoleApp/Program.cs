@@ -8,12 +8,19 @@ namespace icd0008_2019f
 {
     class Program
     {
-        static void Main(string[] args)
+        private static GameSettings _settings = default!;
+        private static Game _game = default!;
+        private static bool _loadGame;
+        private static SavedGames _savedGames = default!;
+
+        private static void Main(string[] args)
         {
             Console.Clear();
 
-            Console.WriteLine("Hello Game!");
+            _settings = GameConfigHandler.LoadConfig();
+            _savedGames = GameConfigHandler.LoadSavedGames();
 
+            Console.WriteLine($"Hello {_settings.GameName}!");
 
             var gameMenu = new Menu(1)
             {
@@ -46,7 +53,7 @@ namespace icd0008_2019f
 
             var menu0 = new Menu(0)
             {
-                Title = "Connecct 4 Main Menu",
+                Title = "Connect 4 Main Menu",
                 MenuItemsDictionary = new Dictionary<string, MenuItem>()
                 {
                     {
@@ -54,6 +61,20 @@ namespace icd0008_2019f
                         {
                             Title = "Start a new game",
                             CommandToExecute = gameMenu.Run
+                        }
+                    },
+                    {
+                        "J", new MenuItem()
+                        {
+                            Title = "Set defaults for game (save to JSON)",
+                            CommandToExecute = SaveSettings
+                        }
+                    },
+                    {
+                        "L", new MenuItem()
+                        {
+                            Title = "Load game",
+                            CommandToExecute = LoadGame
                         }
                     }
                 }
@@ -63,58 +84,150 @@ namespace icd0008_2019f
             menu0.Run();
         }
 
-        static string TestGame()
+        static string SaveSettings()
         {
-            Console.WriteLine("Select the board height (min 4): ");
-            Console.WriteLine(">");
-            var input = Console.ReadLine();
-            if (!int.TryParse(input, out var boardHeight) || boardHeight < 4)
+            Console.Clear();
+
+            var boardWidth = 0;
+            var boardHeight = 0;
+            var userCanceled = false;
+
+            (boardWidth, userCanceled) = GetUserIntInput("Enter board width, min 4.", 4, 100, 0);
+            if (userCanceled) return "";
+
+            (boardHeight, userCanceled) = GetUserIntInput("Enter board height, min 4", 4, 100, 0);
+            if (userCanceled) return "";
+
+            _settings.BoardHeight = boardHeight;
+            _settings.BoardWidth = boardWidth;
+            GameConfigHandler.SaveConfig(_settings);
+
+            return "";
+        }
+
+        static string LoadGame()
+        {
+            Console.Clear();
+            Console.WriteLine("Select your save file number.");
+            Console.WriteLine("_________________________________________");
+            for (int i = 0; i < _savedGames.savedGames.Count; i++)
             {
-                Console.WriteLine("Invalid input, automatically selected default value 6. ");
-                boardHeight = 6;
+                Console.WriteLine(
+                    (i + 1) + " " + _savedGames.savedGames[i].Substring(0, _savedGames.savedGames[i].Length - 5));
             }
 
-            Console.WriteLine("Select the board width (min 4): ");
-            Console.WriteLine(">");
-            input = Console.ReadLine();
-            if (!int.TryParse(input, out var boardWidth) || boardWidth < 4)
-            {
-                Console.WriteLine("Invalid input, automatically selected default value 7. ");
-                boardWidth = 7;
-            }
-
-            var game = new Game(boardHeight, boardWidth);
-            var currentMoves = 0;
-            var done = false;
+            var savefileIdx = 0;
+            var correctInput = false;
             do
             {
-                Console.Clear();
-                GameUI.PrintBoard(game);
-
-                var columnNum = -1;
-
-                do
+                Console.WriteLine(">");
+                var consoleLine = Console.ReadLine();
+                if (int.TryParse(consoleLine, out var userInt))
                 {
-                    Console.WriteLine("Which column would you like to out your piece?(1-" + game.BoardWidth + ")");
-                    Console.Write(">");
-                    var selectedRow = Console.ReadLine();
-
-                    if (!int.TryParse(selectedRow, out columnNum) || columnNum > game.BoardWidth
-                                                               || game.ColumnStatus[columnNum] >= game.BoardHeight)
+                    if (userInt > _savedGames.savedGames.Count || userInt < 1)
                     {
-                        Console.WriteLine($"{selectedRow} is not a correct column or is already full!");
-                        columnNum = -1;
+                        Console.WriteLine("Invalid save file number. Select correct one.");
+                        continue;
                     }
-                } while (columnNum < 1);
 
-                game.Move(columnNum);
+                    savefileIdx = userInt - 1;
+                    correctInput = true;
+                }
+            } while (!correctInput);
+
+            _game = GameConfigHandler.LoadGame(_savedGames.savedGames[savefileIdx]);
+            _loadGame = true;
+            return TestGame();
+        }
+
+
+        private static string TestGame()
+        {
+            if (!_loadGame)
+            {
+                _game = new Game(_settings);
+            }
+
+            var currentMoves = 0;
+
+            var done = false;
+            do
+
+            {
+                Console.Clear();
+                GameUI.PrintBoard(_game);
+
+                var (result, wasCanceled) = GetUserIntInput(
+                    ("Which column would you like to out your piece?(1-" + _game.BoardWidth + ")"),
+                    1, _game.BoardWidth, null, "X", true, "S");
+                if (wasCanceled)
+                {
+                    done = true;
+                    continue;
+                }
+
+                _game.Move(result);
                 currentMoves += 1;
-                done = game.BoardHeight * game.BoardWidth <= currentMoves;
+                done = _game.BoardHeight * _game.BoardWidth <= currentMoves;
             } while (!done);
 
-            Console.WriteLine("Game over! No more moves left.");
+            _loadGame = false;
+            Console.WriteLine("Game over!");
             Console.WriteLine();
             return "M";
+        }
+
+        static (int result, bool wasCanceled) GetUserIntInput(string prompt, int min, int max,
+            int? cancelIntValue = null, string cancelStrValue = "", bool inGameInputs = false,
+            string saveGameValue = "")
+        {
+            do
+            {
+                Console.WriteLine(prompt);
+                if (cancelIntValue.HasValue || !string.IsNullOrWhiteSpace(cancelStrValue))
+                {
+                    Console.WriteLine($"To cancel input enter: {cancelIntValue}" +
+                                      $"{(cancelIntValue.HasValue && !string.IsNullOrWhiteSpace(cancelStrValue) ? " or " : "")}" +
+                                      $"{cancelStrValue}");
+                }
+
+                if (!string.IsNullOrWhiteSpace(saveGameValue))
+                {
+                    Console.WriteLine($"To save your game enter: {saveGameValue}");
+                }
+
+                Console.Write(">");
+                var consoleLine = Console.ReadLine()?.ToUpper().Trim();
+
+                if (consoleLine == cancelStrValue) return (0, true);
+                if (consoleLine == saveGameValue)
+                {
+                    GameConfigHandler.AddSavedGame(_savedGames, _game);
+                    _savedGames = GameConfigHandler.LoadSavedGames();
+                    return (0, true);
+                }
+
+                if (int.TryParse(consoleLine, out var userInt))
+                {
+                    if (userInt == cancelIntValue) return (0, true);
+
+                    if (min > userInt || max < userInt)
+                    {
+                        Console.WriteLine("Invalid input, please select correct number.");
+                        continue;
+                    }
+
+                    if (inGameInputs && _game.ColumnStatus[userInt] >= _game.BoardWidth)
+                    {
+                        Console.WriteLine("Column is full, select another one.");
+                        continue;
+                    }
+
+                    return userInt == cancelIntValue ? (userInt, true) : (userInt, false);
+                }
+
+                Console.WriteLine($"'{consoleLine}' cant be converted to int value!");
+            } while (true);
         }
     }
 }
