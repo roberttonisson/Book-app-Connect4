@@ -46,6 +46,7 @@ namespace MenuSystem
             var command = "";
             do
             {
+                Console.Clear();
                 Console.WriteLine(Title);
                 Console.WriteLine("========================");
 

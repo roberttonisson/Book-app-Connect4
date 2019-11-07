@@ -21,7 +21,7 @@ namespace ConsoleUI
                 line = _verticalSeparator;
                 for (int xIndex = 0; xIndex < game.BoardWidth; xIndex++)
                 {
-                    line = line + " " + GetSingleState(board[yIndex][xIndex]) + " " + _verticalSeparator;
+                    line = line + " " + GetSingleState(board[yIndex, xIndex]) + " " + _verticalSeparator;
                 }
 
                 Console.WriteLine(line);

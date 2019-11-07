@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using ConsoleUI;
+using DAL;
 using GameEngine;
 using MenuSystem;
+
 
 namespace icd0008_2019f
 {
@@ -11,14 +13,14 @@ namespace icd0008_2019f
         private static GameSettings _settings = default!;
         private static Game _game = default!;
         private static bool _loadGame;
-        private static SavedGames _savedGames = default!;
+        private static SavedGamesList _savedGamesList = default!;
 
         private static void Main(string[] args)
         {
             Console.Clear();
 
             _settings = GameConfigHandler.LoadConfig();
-            _savedGames = GameConfigHandler.LoadSavedGames();
+
 
             Console.WriteLine($"Hello {_settings.GameName}!");
 
@@ -107,35 +109,26 @@ namespace icd0008_2019f
 
         static string LoadGame()
         {
+            _savedGamesList = new SavedGamesList();
             Console.Clear();
-            Console.WriteLine("Select your save file number.");
-            Console.WriteLine("_________________________________________");
-            for (int i = 0; i < _savedGames.savedGames.Count; i++)
+            using (var ctx = new AppDatabaseContext())
             {
-                Console.WriteLine(
-                    (i + 1) + " " + _savedGames.savedGames[i].Substring(0, _savedGames.savedGames[i].Length - 5));
+                foreach (var save in ctx.SaveGames)
+                {
+                    _savedGamesList.savedGames.Add(save.Name);
+                }
+            }
+            
+            for (int i = 0; i < _savedGamesList.savedGames.Count; i++)
+            {
+                Console.WriteLine((i + 1) + " " + _savedGamesList.savedGames[i]);
             }
 
-            var savefileIdx = 0;
-            var correctInput = false;
-            do
-            {
-                Console.WriteLine(">");
-                var consoleLine = Console.ReadLine();
-                if (int.TryParse(consoleLine, out var userInt))
-                {
-                    if (userInt > _savedGames.savedGames.Count || userInt < 1)
-                    {
-                        Console.WriteLine("Invalid save file number. Select correct one.");
-                        continue;
-                    }
+            var userInput = GetUserIntInput("Select your save file number.", 1, _savedGamesList.savedGames.Count, null,
+                "X");
+            if (userInput.wasCanceled) return "";
 
-                    savefileIdx = userInt - 1;
-                    correctInput = true;
-                }
-            } while (!correctInput);
-
-            _game = GameConfigHandler.LoadGame(_savedGames.savedGames[savefileIdx]);
+            _game = GameConfigHandler.LoadGame(_savedGamesList.savedGames[userInput.result-1]);
             _loadGame = true;
             return TestGame();
         }
@@ -152,7 +145,6 @@ namespace icd0008_2019f
 
             var done = false;
             do
-
             {
                 Console.Clear();
                 GameUI.PrintBoard(_game);
@@ -186,7 +178,7 @@ namespace icd0008_2019f
                 Console.WriteLine(prompt);
                 if (cancelIntValue.HasValue || !string.IsNullOrWhiteSpace(cancelStrValue))
                 {
-                    Console.WriteLine($"To cancel input enter: {cancelIntValue}" +
+                    Console.WriteLine($"To exit enter: {cancelIntValue}" +
                                       $"{(cancelIntValue.HasValue && !string.IsNullOrWhiteSpace(cancelStrValue) ? " or " : "")}" +
                                       $"{cancelStrValue}");
                 }
@@ -202,8 +194,12 @@ namespace icd0008_2019f
                 if (consoleLine == cancelStrValue) return (0, true);
                 if (consoleLine == saveGameValue)
                 {
-                    GameConfigHandler.AddSavedGame(_savedGames, _game);
-                    _savedGames = GameConfigHandler.LoadSavedGames();
+                    var canceled = GameConfigHandler.Save(_game);
+                    if (true)
+                    {
+                        _loadGame = true;
+                        TestGame();
+                    }
                     return (0, true);
                 }
 

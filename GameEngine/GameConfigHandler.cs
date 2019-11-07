@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Linq;
+using DAL;
+using DOMAIN;
 using Newtonsoft.Json;
 
 namespace GameEngine
@@ -6,88 +9,92 @@ namespace GameEngine
     public static class GameConfigHandler
     {
         private const string FileName = "gamesettings.json";
-        public const string DefaultSaveName = "defaultSave.json";
-        public const string SavedGames = "SavedGames.json";
+        private const string DefaultSaveName = "defaultSave.json";
 
-        public static void SaveConfig(GameSettings settings, string fileName = FileName)
+        public static void SaveConfig(GameSettings settings)
         {
-            using (var writer = System.IO.File.CreateText(fileName))
+            using (var ctx = new AppDatabaseContext())
             {
-                var jsonString = JsonConvert.SerializeObject(settings, Formatting.Indented);
-                writer.Write(jsonString);
+                if (!ctx.GameConfig.Any())
+                {
+                    var config = new GameConfig
+                        {GameConfigJson = JsonConvert.SerializeObject(settings, Formatting.Indented)};
+                    ctx.GameConfig.Add(config);
+                }
+                else
+                {
+                    var config = ctx.GameConfig.First();
+                    config.GameConfigJson = JsonConvert.SerializeObject(settings, Formatting.Indented);
+                }
+
+                ctx.SaveChanges();
             }
         }
 
         public static GameSettings LoadConfig(string fileName = FileName)
         {
-            if (System.IO.File.Exists(fileName))
+            using (var ctx = new AppDatabaseContext())
             {
-                var jsonString = System.IO.File.ReadAllText(fileName);
-                var res = JsonConvert.DeserializeObject<GameSettings>(jsonString);
+                if (ctx.GameConfig.Any())
+                {
+                    return JsonConvert.DeserializeObject<GameSettings>(ctx.GameConfig.First().GameConfigJson);
+                }
+
+                return new GameSettings();
+            }
+        }
+
+
+        public static bool Save(Game game)
+        {
+            using (var ctx = new AppDatabaseContext())
+            {
+                var (name, overwrite, canceled) = AskFileName(ctx, null, "X");
+                if (canceled) return true;
+                if (!overwrite)
+                {
+                    var saveGame = new SaveGame
+                        {Name = name, GameObjectJson = JsonConvert.SerializeObject(game, Formatting.Indented)};
+                    ctx.SaveGames.Add(saveGame);
+                }
+                else
+                {
+                    var saveGame = ctx.SaveGames.First(n => n.Name == name);
+                    saveGame.GameObjectJson = JsonConvert.SerializeObject(game, Formatting.Indented);
+                }
+
+                ctx.SaveChanges();
+            }
+
+            return false;
+        }
+
+        public static Game LoadGame(string saveName = DefaultSaveName)
+        {
+            using (var ctx = new AppDatabaseContext())
+            {
+                var res = JsonConvert.DeserializeObject<Game>(ctx.SaveGames.First(n => n.Name == saveName)
+                    .GameObjectJson);
                 return res;
             }
-
-            return new GameSettings();
         }
 
-        public static SavedGames LoadSavedGames(string fileName = SavedGames)
+        public static (string name, bool overwrite, bool canceled) AskFileName(AppDatabaseContext ctx,
+            int? cancelIntValue = null, string cancelStrValue = "")
         {
-            if (System.IO.File.Exists(fileName))
-            {
-                var jsonString = System.IO.File.ReadAllText(fileName);
-                var res = JsonConvert.DeserializeObject<SavedGames>(jsonString);
-                return res;
-            }
-
-            return new SavedGames();
-        }
-
-        public static void AddSavedGame(SavedGames currentSaves, Game game)
-        {
-            var file = AskFileName(currentSaves);
-            if (!file.overwrite)
-            {
-                currentSaves.savedGames.Add(file.name + ".json");
-            }
-
-            using (var writer = System.IO.File.CreateText(SavedGames))
-            {
-                var jsonString = JsonConvert.SerializeObject(currentSaves, Formatting.Indented);
-                writer.Write(jsonString);
-            }
-
-            SaveGame(game, file.name + ".json");
-        }
-
-        public static void SaveGame(Game game, string fileName = DefaultSaveName)
-        {
-            using (var writer = System.IO.File.CreateText(fileName))
-            {
-                var jsonString = JsonConvert.SerializeObject(game, Formatting.Indented);
-                writer.Write(jsonString);
-            }
-        }
-
-        public static Game LoadGame(string fileName = DefaultSaveName)
-        {
-            if (System.IO.File.Exists(fileName))
-            {
-                var jsonString = System.IO.File.ReadAllText(fileName);
-                var res = JsonConvert.DeserializeObject<Game>(jsonString);
-                return res;
-            }
-
-            return new Game(new GameSettings());
-        }
-
-        public static (string name, bool overwrite) AskFileName(SavedGames currentSaves)
-        {
-            var notEmpty = false;
+            var valid = false;
             var userInput = "";
             var overwrite = false;
             do
             {
+                Console.Clear();
                 Console.WriteLine("Please enter your preferred Save name.");
+                if (cancelIntValue.HasValue || !string.IsNullOrWhiteSpace(cancelStrValue))
+                {
+                    Console.WriteLine($"To go back to the game enter: {cancelIntValue}" +
+                                      $"{(cancelIntValue.HasValue && !string.IsNullOrWhiteSpace(cancelStrValue) ? " or " : "")}" +
+                                      $"{cancelStrValue}");
+                }
                 Console.WriteLine(">");
                 userInput = Console.ReadLine();
                 if (string.IsNullOrEmpty(userInput))
@@ -96,7 +103,9 @@ namespace GameEngine
                     continue;
                 }
 
-                if (currentSaves.savedGames.Contains(userInput + ".json"))
+                if (userInput.ToUpper().Trim() == cancelStrValue) return ("", false, true);
+
+                if (ctx.SaveGames.Any(n => n.Name == userInput))
                 {
                     Console.WriteLine(
                         "That name already exist. Would you like to overwrite?(Enter Y to agree. N to not overwrite. B to go back.)");
@@ -112,10 +121,11 @@ namespace GameEngine
                     }
                 }
 
-                notEmpty = true;
-            } while (!notEmpty);
 
-            return (userInput, overwrite);
+                valid = true;
+            } while (!valid);
+
+            return (userInput, overwrite, false);
         }
     }
 }

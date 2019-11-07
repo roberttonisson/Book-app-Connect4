@@ -11,6 +11,15 @@
       <ProjectReference Include="..\ConsoleUI\ConsoleUI.csproj" />
       <ProjectReference Include="..\GameEngine\GameEngine.csproj" />
       <ProjectReference Include="..\MenuSystem\MenuSystem.csproj" />
+      <ProjectReference Include="..\DAL\DAL.csproj" />
+      <ProjectReference Include="..\DOMAIN\DOMAIN.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.0.0" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.0.0" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.0.0" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer.Design" Version="1.1.6" />
     </ItemGroup>
 
 </Project>

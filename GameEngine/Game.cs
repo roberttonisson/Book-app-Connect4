@@ -8,7 +8,7 @@ namespace GameEngine
     /// </summary>
     public class Game
     {
-        public CellState[][] Board { get; set; }
+        public CellState[,] Board { get; set; } = default!;
 
         public int BoardWidth { get; set; }
         public int BoardHeight { get; set; }
@@ -36,17 +36,13 @@ namespace GameEngine
                 ColumnStatus[i] = 0;
             }
 
-            Board = new CellState[settings.BoardHeight][];
-            for (int i = 0; i < BoardHeight; i++)
-            {
-                Board[i] = new CellState[BoardWidth];
-            }
+            Board = new CellState[BoardHeight, BoardWidth];
         }
 
 
-        public CellState[][] GetBoard()
+        public CellState[,] GetBoard()
         {
-            var result = new CellState[BoardHeight][];
+            var result = new CellState[BoardHeight,BoardWidth];
             Array.Copy(Board, result, Board.Length);
             return result;
         }
@@ -54,7 +50,7 @@ namespace GameEngine
 
         public void Move(int row)
         {
-            Board[BoardHeight - ColumnStatus[row] - 1][row - 1] = _playerZeroMove ? CellState.O : CellState.X;
+            Board[BoardHeight - ColumnStatus[row] - 1, row - 1] = _playerZeroMove ? CellState.O : CellState.X;
 
             ColumnStatus[row] = ColumnStatus[row] + 1;
 

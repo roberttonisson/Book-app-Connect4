@@ -2,7 +2,7 @@
 
 namespace GameEngine
 {
-    public class SavedGames
+    public class SavedGamesList
     {
         public List<string> savedGames = new List<string>();
     }
