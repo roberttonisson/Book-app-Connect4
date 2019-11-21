@@ -1,0 +1,37 @@
+@page
+@model WebApp.Pages.BookAuthors.CreateModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>BookAuthor</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="BookAuthor.BookId" class="control-label"></label>
+                <select asp-for="BookAuthor.BookId" class ="form-control" asp-items="Model.BookSelectList"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="BookAuthor.AuthorId" class="control-label"></label>
+                <select asp-for="BookAuthor.AuthorId" class ="form-control" asp-items="Model.AuthorSelectList"></select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
