@@ -1,0 +1,142 @@
+@page
+@using Microsoft.AspNetCore.SignalR.Protocol
+@model WebApp.Pages.Books.IndexModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-page="Create">Create New</a>
+</p>
+
+<form class="form-inline" method="get">
+    <div class="form-group">
+        <!-- weird hack with value="" -->
+        <input asp-for="Search" value="@Model.Search" class="form-control"/>
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Search" class="btn btn-primary"/>
+        <input type="submit" value="Reset" name="ToDoActionReset" class="btn btn-secondary"
+               @(string.IsNullOrWhiteSpace(Model.Search) ? "disabled=\"disabled\"" : "")/>
+    </div>
+</form>
+<div class="padding-on-top-20">
+    @if (!string.IsNullOrWhiteSpace(Model.Search))
+    {
+        <p>Search is active. Search term: @Model.Search</p>
+    }
+    <p>Records: @Model.Books.Count</p>
+</div>
+
+
+<div class="row">
+
+    @foreach (var item in Model.Books)
+    {
+        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+            <div class="card">
+
+                <div class="card-header">
+                    @Html.DisplayFor(modelItem => item.Book.Title)
+                </div>
+                <div class="card-body">
+                    <p class="card-text">
+                        @Html.DisplayFor(modelItem => item.Book.Summary)
+                    </p>
+
+                    <a asp-page="./Edit" asp-route-id="@item.Book.BookId" class="card-link">Edit</a>
+                    <a asp-page="./Details" asp-route-id="@item.Book.BookId" class="card-link">Details</a>
+                    <a asp-page="./Delete" asp-route-id="@item.Book.BookId" class="card-link">Delete</a>
+                </div>
+            </div>
+        </div>
+    }
+
+</div>
+
+@*
+<table class="table">
+    <thead>
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Books[0].Book.Title)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Books[0].Book.Summary)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Books[0].Book.PublishingYear)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Books[0].Book.AuthoredYear)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Books[0].Book.WordCount)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Books[0].Book.Language)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Books[0].Book.Publisher)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Books[0].Book.BookAuthors)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Books[0].Book.Comments)
+        </th>
+
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model.Books)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Book.Title)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Book.Summary)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Book.PublishingYear)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Book.AuthoredYear)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Book.WordCount)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Book.Language.LanguageName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Book.Publisher.PublisherName)
+            </td>
+            <td>
+                <p>Authors: @item.Book.BookAuthors.Count</p>
+                @foreach (var bookAuthor in item.Book.BookAuthors)
+                {
+                    <p>@Html.DisplayFor(modelItem => bookAuthor.Author.FirstLastName)</p>
+                }
+            </td>
+            <td>
+                <p>Comments: @item.CommentCount</p>
+                <p>Last comment: @item.LastComment</p>
+                <a asp-page="/Comments/Index" asp-route-bookid="@item.Book.BookId">Read all</a>
+            </td>
+            <td>
+                <a asp-page="./Edit" asp-route-id="@item.Book.BookId">Edit</a> |
+                <a asp-page="./Details" asp-route-id="@item.Book.BookId">Details</a> |
+                <a asp-page="./Delete" asp-route-id="@item.Book.BookId">Delete</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+*@
