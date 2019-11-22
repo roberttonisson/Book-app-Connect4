@@ -19,11 +19,49 @@ namespace WebApp.Pages.Authors
             _context = context;
         }
 
-        public IList<Author> Author { get;set; } = default!;
+        public IList<Author> Author { get; set; } = default!;
 
-        public async Task OnGetAsync()
+
+        public async Task OnGetAsync(string? orderBy, string? descending)
         {
-            Author = await _context.Authors.ToListAsync();
+            var temp = _context.Authors;
+            var desc = descending == "true";
+            switch (orderBy)
+            {
+                case "yearofbirth":
+                    if (desc)
+                    {
+                        Author = await temp.OrderByDescending(a => a.YearOfBirth).ToListAsync();
+                    }
+                    else
+                    {
+                        Author = await temp.OrderBy(a => a.YearOfBirth).ToListAsync();
+                    }
+
+                    break;
+                case "firstname":
+                    if (desc)
+                    {
+                        Author = await temp.OrderByDescending(a => a.FirstName).ToListAsync();
+                    }
+                    else
+                    {
+                        Author = await temp.OrderBy(a => a.FirstName).ToListAsync();
+                    }
+
+                    break;
+                default:
+                    if (desc)
+                    {
+                        Author = await temp.OrderByDescending(a => a.LastName).ToListAsync();
+                    }
+                    else
+                    {
+                        Author = await temp.OrderBy(a => a.LastName).ToListAsync();
+                    }
+
+                    break;
+            }
         }
     }
 }

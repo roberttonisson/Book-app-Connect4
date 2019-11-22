@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using DAL;
 using Domain;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace WebApp.Pages.Comments
 {
@@ -20,20 +21,25 @@ namespace WebApp.Pages.Comments
         }
 
         public IList<Comment> Comment { get;set; } = default!;
+        public IList<Book> Book { get;set; } = default!;
 
         public async Task OnGetAsync(int? bookid)
         {
-
             if (bookid == null)
             {
                 Comment = await _context.Comments
-                    .Include(c => c.Book).ToListAsync();
+                    .Include(c => c.Book)
+                    .ToListAsync();
+                Book = await _context.Books
+                    .ToListAsync();
             }
             else
             {
                 Comment = await _context.Comments
                     .Include(c => c.Book)
                     .Where(c => c.BookId == bookid)
+                    .ToListAsync();
+                Book = await _context.Books
                     .ToListAsync();
                 
             }

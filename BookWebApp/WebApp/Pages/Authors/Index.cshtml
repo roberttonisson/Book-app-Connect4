@@ -10,17 +10,36 @@
 <p>
     <a asp-page="Create">Create New</a>
 </p>
+
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Author[0].FirstName)
+                <p>First Name</p>
+                <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+                  <div class="btn-group mr-2 btn-group-sm" role="group" aria-label="First group">
+                    <button onclick="location.href='Authors?orderBy=firstname&descending=false'" type="button" class="btn btn-secondary">↑</button>
+                    <button onclick="location.href='Authors?orderBy=firstname&descending=true'" type="button" class="btn btn-secondary">↓</button>
+                  </div>
+                </div>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Author[0].LastName)
+                <p>Last Name</p> 
+                <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+                  <div class="btn-group mr-2 btn-group-sm" role="group" aria-label="First group">
+                    <button onclick="location.href='Authors?orderBy=lastname&descending=false'" type="button" class="btn btn-secondary">↑</button>
+                    <button onclick="location.href='Authors?orderBy=lastname&descending=true'" type="button" class="btn btn-secondary">↓</button>
+                  </div>
+                </div>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Author[0].YearOfBirth)
+                <p>Year of birth</p> 
+                <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+                  <div class="btn-group mr-2 btn-group-sm" role="group" aria-label="First group">
+                    <button onclick="location.href='Authors?orderBy=yearofbirth&descending=false'" type="button" class="btn btn-secondary">↑</button>
+                    <button onclick="location.href='Authors?orderBy=yearofbirth&descending=true'" type="button" class="btn btn-secondary">↓</button>
+                  </div>
+                </div>
             </th>
             <th></th>
         </tr>

@@ -1,4 +1,5 @@
 @page
+@using Domain
 @model WebApp.Pages.Authors.DetailsModel
 
 @{
@@ -9,7 +10,7 @@
 
 <div>
     <h4>Author</h4>
-    <hr />
+    <hr/>
     <dl class="row">
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Author.FirstName)
@@ -28,6 +29,23 @@
         </dt>
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Author.YearOfBirth)
+        </dd>
+        <dt class="col-sm-2">
+            <p>Total books</p>
+        </dt>
+        <dd class="col-sm-10">
+            <p>@Model.Author.AuthorBooks.Count</p>
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Author.AuthorBooks)
+        </dt>
+        <dd class="col-sm-10">
+            @foreach (var book in Model.Author.AuthorBooks)
+            {
+                <p>
+                    <a asp-page="/Books/Details" asp-route-id="@book.Book.BookId" >@Html.DisplayFor(modelItem => book.Book.Title)</a>
+                </p>
+            }
         </dd>
     </dl>
 </div>

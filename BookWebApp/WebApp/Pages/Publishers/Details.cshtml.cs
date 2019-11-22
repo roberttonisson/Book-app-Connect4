@@ -28,7 +28,9 @@ namespace WebApp.Pages.Publishers
                 return NotFound();
             }
 
-            Publisher = await _context.Publishers.FirstOrDefaultAsync(m => m.PublisherId == id);
+            Publisher = await _context.Publishers
+                .Include(b => b.Books)
+                .FirstOrDefaultAsync(m => m.PublisherId == id);
 
             if (Publisher == null)
             {

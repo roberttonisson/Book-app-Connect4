@@ -28,7 +28,10 @@ namespace WebApp.Pages.Authors
                 return NotFound();
             }
 
-            Author = await _context.Authors.FirstOrDefaultAsync(m => m.AuthorId == id);
+            Author = await _context.Authors
+                .Include(b => b.AuthorBooks)
+                .ThenInclude(a => a.Book)
+                .FirstOrDefaultAsync(m => m.AuthorId == id);
 
             if (Author == null)
             {

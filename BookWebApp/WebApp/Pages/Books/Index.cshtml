@@ -40,16 +40,21 @@
             <div class="card">
 
                 <div class="card-header">
-                    @Html.DisplayFor(modelItem => item.Book.Title)
+                    <a asp-page="./Details" asp-route-id="@item.Book.BookId" class="card-link">@Html.DisplayFor(modelItem => item.Book.Title)</a>
+                </div>
+                <div class="card-header">
+                    @foreach (var author in item.Book.BookAuthors)
+                    {
+                        <a asp-page="/Authors/Details" asp-route-id="@author.Author.AuthorId" class="card-link">@Html.DisplayFor(modelItem => author.Author.FirstLastName)</a>
+                    }
+
                 </div>
                 <div class="card-body">
                     <p class="card-text">
                         @Html.DisplayFor(modelItem => item.Book.Summary)
                     </p>
-
-                    <a asp-page="./Edit" asp-route-id="@item.Book.BookId" class="card-link">Edit</a>
-                    <a asp-page="./Details" asp-route-id="@item.Book.BookId" class="card-link">Details</a>
                     <a asp-page="./Delete" asp-route-id="@item.Book.BookId" class="card-link">Delete</a>
+                    <a asp-page="/Comments/Index" asp-route-bookid="@item.Book.BookId" class="card-link">Comments(@item.CommentCount)</a>
                 </div>
             </div>
         </div>

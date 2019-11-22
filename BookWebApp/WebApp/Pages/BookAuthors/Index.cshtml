@@ -12,24 +12,25 @@
 </p>
 <table class="table">
     <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.BookAuthor[0].Book)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.BookAuthor[0].Author)
-            </th>
-            <th></th>
-        </tr>
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.BookAuthor[0].Book)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.BookAuthor[0].Author)
+        </th>
+        <th></th>
+    </tr>
     </thead>
     <tbody>
-@foreach (var item in Model.BookAuthor) {
+    @foreach (var item in Model.BookAuthor)
+    {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Book.Title)
+                <a asp-page="/Books/Details" asp-route-id="@item.Book.BookId">@Html.DisplayFor(modelItem => item.Book.Title)</a>
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Author.FirstName)
+                <a asp-page="/Authors/Details" asp-route-id="@item.Author.AuthorId">@Html.DisplayFor(modelItem => item.Author.FirstLastName)</a>
             </td>
             <td>
                 <a asp-page="./Edit" asp-route-id="@item.BookAuthorId">Edit</a> |
@@ -37,6 +38,6 @@
                 <a asp-page="./Delete" asp-route-id="@item.BookAuthorId">Delete</a>
             </td>
         </tr>
-}
+    }
     </tbody>
 </table>

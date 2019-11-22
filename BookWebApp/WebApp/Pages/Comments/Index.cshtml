@@ -10,6 +10,18 @@
 <p>
     <a asp-page="Create">Create New</a>
 </p>
+<div class="dropdown">
+  <button onclick="myFunction()" class="dropbtn">Select book</button>
+  <div id="myDropdown" class="dropdown-content">
+    <input type="text" placeholder="Search.." id="myInput" onkeyup="filterFunction()">
+    <a asp-page="/Comments/Index">All</a>
+    @foreach (var book in Model.Book)
+    {
+        <a asp-page="/Comments/Index" asp-route-bookid="@book.BookId">@Html.DisplayFor(modelItem => book.Title)</a>
+    }
+  </div>
+</div>
+
 <table class="table">
     <thead>
         <tr>
@@ -18,6 +30,9 @@
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Comment[0].Book)
+            </th>
+            <th>
+                Total comments: @Model.Comment.Count
             </th>
             <th></th>
         </tr>
@@ -29,7 +44,7 @@
                 @Html.DisplayFor(modelItem => item.CommentText)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Book.Title)
+                <a asp-page="/Books/Details" asp-route-id="@item.Book.BookId">@Html.DisplayFor(modelItem => item.Book.Title)</a>
             </td>
             <td>
                 <a asp-page="./Edit" asp-route-id="@item.CommentId">Edit</a> |
@@ -40,3 +55,27 @@
 }
     </tbody>
 </table>
+
+<script>
+/* When the user clicks on the button,
+toggle between hiding and showing the dropdown content */
+function myFunction() {
+  document.getElementById("myDropdown").classList.toggle("show");
+}
+
+function filterFunction() {
+  var input, filter, ul, li, a, i;
+  input = document.getElementById("myInput");
+  filter = input.value.toUpperCase();
+  div = document.getElementById("myDropdown");
+  a = div.getElementsByTagName("a");
+  for (i = 0; i < a.length; i++) {
+    txtValue = a[i].textContent || a[i].innerText;
+    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+      a[i].style.display = "";
+    } else {
+      a[i].style.display = "none";
+    }
+  }
+}
+</script>
