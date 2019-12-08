@@ -43,9 +43,9 @@
                     <a asp-page="./Details" asp-route-id="@item.Book.BookId" class="card-link">@Html.DisplayFor(modelItem => item.Book.Title)</a>
                 </div>
                 <div class="card-header">
-                    @foreach (var author in item.Book.BookAuthors)
+                    @foreach (var author in item.Book.BookAuthors!)
                     {
-                        <a asp-page="/Authors/Details" asp-route-id="@author.Author.AuthorId" class="card-link">@Html.DisplayFor(modelItem => author.Author.FirstLastName)</a>
+                        <a asp-page="/Authors/Details" asp-route-id="@author.Author!.AuthorId" class="card-link">@Html.DisplayFor(modelItem => author.Author!.FirstLastName)</a>
                     }
 
                 </div>

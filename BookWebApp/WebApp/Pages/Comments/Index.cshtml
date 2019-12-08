@@ -44,7 +44,7 @@
                 @Html.DisplayFor(modelItem => item.CommentText)
             </td>
             <td>
-                <a asp-page="/Books/Details" asp-route-id="@item.Book.BookId">@Html.DisplayFor(modelItem => item.Book.Title)</a>
+                <a asp-page="/Books/Details" asp-route-id="@item.Book!.BookId">@Html.DisplayFor(modelItem => item.Book!.Title)</a>
             </td>
             <td>
                 <a asp-page="./Edit" asp-route-id="@item.CommentId">Edit</a> |

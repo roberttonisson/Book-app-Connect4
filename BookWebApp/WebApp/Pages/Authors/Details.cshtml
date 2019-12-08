@@ -34,7 +34,7 @@
             <p>Total books</p>
         </dt>
         <dd class="col-sm-10">
-            <p>@Model.Author.AuthorBooks.Count</p>
+            <p>@Model.Author.AuthorBooks!.Count</p>
         </dd>
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Author.AuthorBooks)
@@ -43,7 +43,7 @@
             @foreach (var book in Model.Author.AuthorBooks)
             {
                 <p>
-                    <a asp-page="/Books/Details" asp-route-id="@book.Book.BookId" >@Html.DisplayFor(modelItem => book.Book.Title)</a>
+                    <a asp-page="/Books/Details" asp-route-id="@book.Book!.BookId" >@Html.DisplayFor(modelItem => book.Book!.Title)</a>
                 </p>
             }
         </dd>

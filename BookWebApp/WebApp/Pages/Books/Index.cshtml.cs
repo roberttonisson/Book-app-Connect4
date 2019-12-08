@@ -59,12 +59,12 @@ namespace WebApp.Pages.Books
             {
                 bookQuery = bookQuery
                     .Where(b =>
-                        b.Book.Title.ToLower().Contains(Search) ||
-                        b.Book.Summary.ToLower().Contains(Search) ||
-                        b.Book.Publisher.PublisherName.ToLower().Contains(Search) ||
-                        b.Book.BookAuthors.Any(a =>
-                            a.Author.FirstName.ToLower().Contains(Search) ||
-                            a.Author.LastName.ToLower().Contains(Search))
+                        b.Book!.Title.ToLower().Contains(Search) ||
+                        b.Book!.Summary!.ToLower().Contains(Search) ||
+                        b.Book!.Publisher!.PublisherName.ToLower().Contains(Search) ||
+                        b.Book!.BookAuthors.Any(a =>
+                            a.Author!.FirstName.ToLower().Contains(Search) ||
+                            a.Author!.LastName.ToLower().Contains(Search))
                     );
             }
 

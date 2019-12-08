@@ -27,10 +27,10 @@
     {
         <tr>
             <td>
-                <a asp-page="/Books/Details" asp-route-id="@item.Book.BookId">@Html.DisplayFor(modelItem => item.Book.Title)</a>
+                <a asp-page="/Books/Details" asp-route-id="@item.Book!.BookId">@Html.DisplayFor(modelItem => item.Book!.Title)</a>
             </td>
             <td>
-                <a asp-page="/Authors/Details" asp-route-id="@item.Author.AuthorId">@Html.DisplayFor(modelItem => item.Author.FirstLastName)</a>
+                <a asp-page="/Authors/Details" asp-route-id="@item.Author!.AuthorId">@Html.DisplayFor(modelItem => item.Author!.FirstLastName)</a>
             </td>
             <td>
                 <a asp-page="./Edit" asp-route-id="@item.BookAuthorId">Edit</a> |
