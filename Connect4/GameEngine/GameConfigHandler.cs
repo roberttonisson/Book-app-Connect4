@@ -2,6 +2,7 @@
 using System.Linq;
 using DAL;
 using DOMAIN;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 namespace GameEngine
@@ -11,9 +12,10 @@ namespace GameEngine
         private const string FileName = "gamesettings.json";
         private const string DefaultSaveName = "defaultSave.json";
 
-        public static void SaveConfig(GameSettings settings)
+        public static void SaveConfig(GameSettings settings, DbContextOptions dbOptions)
         {
-            using (var ctx = new AppDatabaseContext())
+            var ctx = new AppDatabaseContext(dbOptions);
+            using (ctx)
             {
                 if (!ctx.GameConfig.Any())
                 {
@@ -31,9 +33,10 @@ namespace GameEngine
             }
         }
 
-        public static GameSettings LoadConfig(string fileName = FileName)
+        public static GameSettings LoadConfig(DbContextOptions dbOptions, string fileName = FileName)
         {
-            using (var ctx = new AppDatabaseContext())
+            var ctx = new AppDatabaseContext(dbOptions);
+            using (ctx)
             {
                 if (ctx.GameConfig.Any())
                 {
@@ -45,9 +48,10 @@ namespace GameEngine
         }
 
 
-        public static bool Save(Game game)
+        public static bool Save(Game game, DbContextOptions dbOptions)
         {
-            using (var ctx = new AppDatabaseContext())
+            var ctx = new AppDatabaseContext(dbOptions);
+            using (ctx)
             {
                 var (name, overwrite, canceled) = AskFileName(ctx, null, "X");
                 if (canceled) return true;
@@ -69,11 +73,51 @@ namespace GameEngine
             return false;
         }
 
-        public static Game LoadGame(string saveName = DefaultSaveName)
+        public static int SaveInWeb(Game game, DbContextOptions dbOptions, int id, string saveName = "")
         {
-            using (var ctx = new AppDatabaseContext())
+            var ctx = new AppDatabaseContext(dbOptions);
+            var returnId = id;
+            using (ctx)
+            {
+                if (id == -1)
+                {
+                    var saveGame = new SaveGame
+                        {Name = saveName, GameObjectJson = JsonConvert.SerializeObject(game, Formatting.Indented)};
+                    ctx.SaveGames.Add(saveGame);
+
+                    ctx.SaveChanges();
+                    returnId = saveGame.SaveGameId;
+                }
+                else
+                {
+                    var saveGame = ctx.SaveGames.First(n => n.SaveGameId == id);
+                    saveGame.GameObjectJson = JsonConvert.SerializeObject(game, Formatting.Indented);
+
+                    ctx.SaveChanges();
+                    returnId = saveGame.SaveGameId;
+                }
+            }
+
+            return returnId;
+        }
+
+        public static Game LoadGame(DbContextOptions dbOptions, string saveName = DefaultSaveName)
+        {
+            var ctx = new AppDatabaseContext(dbOptions);
+            using (ctx)
             {
                 var res = JsonConvert.DeserializeObject<Game>(ctx.SaveGames.First(n => n.Name == saveName)
+                    .GameObjectJson);
+                return res;
+            }
+        }
+        
+        public static Game LoadGameInWeb(DbContextOptions dbOptions, int saveGameId)
+        {
+            var ctx = new AppDatabaseContext(dbOptions);
+            using (ctx)
+            {
+                var res = JsonConvert.DeserializeObject<Game>(ctx.SaveGames.First(n => n.SaveGameId == saveGameId)
                     .GameObjectJson);
                 return res;
             }
@@ -95,6 +139,7 @@ namespace GameEngine
                                       $"{(cancelIntValue.HasValue && !string.IsNullOrWhiteSpace(cancelStrValue) ? " or " : "")}" +
                                       $"{cancelStrValue}");
                 }
+
                 Console.WriteLine(">");
                 userInput = Console.ReadLine();
                 if (string.IsNullOrEmpty(userInput))

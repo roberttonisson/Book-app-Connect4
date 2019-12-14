@@ -8,11 +8,4 @@
 
         public string GameObjectJson { get; set; } = default!;
     }
-
-    public class GameConfig
-    {
-        public int GameConfigId { get; set; }
-
-        public string GameConfigJson { get; set; } = default!;
-    }
 }

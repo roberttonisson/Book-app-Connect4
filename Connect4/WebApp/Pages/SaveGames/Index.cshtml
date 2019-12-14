@@ -1,0 +1,35 @@
+@page
+@model WebApp.Pages_SaveGames.IndexModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-page="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.SaveGame[0].Name)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.SaveGame) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                <a href="../Game/Game?SaveGameId=@item.SaveGameId">Load Game</a> |
+                <a asp-page="./Delete" asp-route-id="@item.SaveGameId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

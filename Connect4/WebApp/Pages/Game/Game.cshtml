@@ -1,0 +1,103 @@
+﻿@page
+@using GameEngine
+@model WebApp.Pages.Game.GameModel
+
+@{
+    ViewData["Title"] = "Game";
+}
+
+<h3>Connect 4</h3>
+@if (Model.GameIsOver)
+{
+    @if (Model.Winner == "nobody")
+    {
+        <div class="alert">
+            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+            <strong>Game over</strong>, @Model.Winner wins.
+        </div>
+    }
+    @if (Model.Winner == "Blue")
+    {
+        <div class="alertBlue">
+            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+            <strong>Game over</strong>, @Model.Winner wins.
+        </div>
+    }
+    @if (Model.Winner == "Red")
+    {
+        <div class="alertRed">
+            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+            <strong>Game over</strong>, @Model.Winner wins.
+        </div>
+    }
+}
+<table>
+    @if (!Model.GameIsOver)
+    {
+        <tr class="gameButtons">
+
+            @for (int i = 0; i < Model.Game.BoardWidth; i++)
+            {
+                <form method="post" class="gameButtons">
+                    <input class="gameButtons" type="submit" value="@(i + 1)" asp-route-id="@Model.GameId" asp-route-selectedRow="@(i + 1)"/>
+                </form>
+            }
+
+        </tr>
+    }
+    @for (int i = 0; i < Model.Game.BoardHeight; i++)
+    {
+        <tr class="gameRow">
+            @for (int y = 0; y < Model.Game.BoardWidth; y++)
+            {
+                @if (Model.Game.Board[i, y] == CellState.Empty)
+                {
+                    <td class="gameCellEmpty">
+                        <div> </div>
+                    </td>
+                }
+                @if (Model.Game.Board[i, y] == CellState.X)
+                {
+                    <td class="gameCellX">
+                        <div> </div>
+                    </td>
+                }
+                @if (Model.Game.Board[i, y] == CellState.O)
+                {
+                    <td class="gameCellO">
+                        <div> </div>
+                    </td>
+                }
+            }
+        </tr>
+    }
+</table>
+
+@if (Model.Game._playerZeroMove && !Model.GameIsOver)
+{
+    <h3 style="color: red">Red Moves</h3>
+}
+@if (!Model.Game._playerZeroMove && !Model.GameIsOver)
+{
+    <h3 style="color: #005cbf">Blue Moves</h3>
+}
+
+<br>
+@if (!Model.GameIsOver)
+{
+    <h5>
+        <a asp-page="/Game/Index">Go back</a>
+    </h5>
+}
+@if (Model.GameIsOver)
+{
+    <h5>
+        <a asp-page="/Game/Index" asp-route-idToRemove="@Model.GameId" asp-route-finished="true">Go back</a>
+    </h5>
+}
+<br>
+<br>
+<div>Choose a row to put your piece.</div>
+<div>First to get 4 in a row wins, either diagonally, horizontally or vertically.</div>
+<div>Change board size in Settings.</div>
+<div>This games saves automatically, check in "Saved games" from the menu and look for your games's name.</div>
